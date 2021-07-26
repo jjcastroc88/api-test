@@ -1,4 +1,16 @@
 import express from 'express';
+import log4js from 'log4js';
+
+log4js.configure({
+  appenders: {
+    out: {type: 'stdout'},
+    server: {type: 'file', filename: './logs/server.log'},
+  },
+  categories: {default: {appenders: ['server', 'out'], level: 'error'}},
+});
+const logger = log4js.getLogger('server');
+logger.level = 'all';
+
 const app = express();
 const PORT = 3002;
 
@@ -38,7 +50,7 @@ export const getNumbers = number => {
     numbers.push(getLabel(i));
   }
 
-  //logger.error('message info', `the Response is ${number.join('-')}`);
+  logger.info('message info', `the Response is ${numbers.join('-')}`);
   return numbers;
 }
 
@@ -46,7 +58,7 @@ app.get('/api/numbers/:number', (req, res) => {
   const currentNumber = +req.params.number;
 
   if (!currentNumber) {
-    //logger.error('message error', `the number is not correct ${currentNumber}`);
+    logger.error('message error', `the number is not correct ${currentNumber}`);
     res.json({'message': 'error'});
   }
 
@@ -55,5 +67,11 @@ app.get('/api/numbers/:number', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
+  logger.info(`Server running at http://localhost:${PORT}`);
 });
 
+app.on('uncaughtException', err => {
+  logger.fatal(err);
+  console.fatal(err);
+  process.exit(1);
+});
