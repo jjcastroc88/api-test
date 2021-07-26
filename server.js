@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const app = express();
 const PORT = 3002;
 
@@ -6,7 +6,7 @@ const BIG = 'Big';
 const BANG = 'Bang';
 const THEORY = 'Theory';
 
-const getLabel = value => {
+export const getLabel = value => {
   let label = value;
   const isMultiThree = (value % 3) === 0;
   const isMultiFive = (value % 5) === 0;
@@ -31,13 +31,14 @@ const getLabel = value => {
   return label;
 }
 
-const getNumbers = number => {
+export const getNumbers = number => {
   const numbers = [];
 
   for (let i = 1; i <= number; i++) {
     numbers.push(getLabel(i));
   }
 
+  //logger.error('message info', `the Response is ${number.join('-')}`);
   return numbers;
 }
 
@@ -45,6 +46,7 @@ app.get('/api/numbers/:number', (req, res) => {
   const currentNumber = +req.params.number;
 
   if (!currentNumber) {
+    //logger.error('message error', `the number is not correct ${currentNumber}`);
     res.json({'message': 'error'});
   }
 
